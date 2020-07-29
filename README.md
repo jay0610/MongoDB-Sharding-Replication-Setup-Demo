@@ -21,3 +21,7 @@ Config Server ReplicaSet
 
 Router
   192.168.1.41	router-mongodb.local	router-mongodb
+
+
+Since to test sharding you need to have a data more than of shard current chunk size (default is 64 MB) you will need data more than that.
+You can use this url https://www.kaggle.com/ to get bigger datasets to test sharding and distribution of data across shards.
