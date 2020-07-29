@@ -1,0 +1,957 @@
+Configuration of config servers replica set.
+--------------------------------------------
+
+1> Edit files mongod.conf on servers - config1-mongo.local & config2-mongo.local
+
+@config1-mongo.local
+
+bindIP: 192.168.1.31
+
+replication: 
+  replSetName: "config01"
+
+sharding:
+  clusterRole: configsvr
+
+@config2-mongo.local
+
+bindIP: 192.168.1.32
+
+replication: 
+  replSetName: "config01"
+
+sharding:
+  clusterRole: configsvr
+
+The configuration of Config Server Replica Set is done.
+
+2> Restart mongod services on both config server nodes.
+
+[root@config1-mongodb ~]# service mongod restart
+Redirecting to /bin/systemctl restart mongod.service
+ 
+3> Connect to mongo from config1-mongodb.local 
+
+mongo --host config1-mongodb.local
+
+4> Initiate replication from config1-mongodb.local.
+
+> rs.initiate()
+{
+        "info2" : "no configuration specified. Using a default configuration for the set",
+        "me" : "192.168.1.31:27017",
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : Timestamp(1594564508, 1),
+                "electionId" : ObjectId("000000000000000000000000")
+        },
+        "lastCommittedOpTime" : Timestamp(0, 0),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594564508, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1594564508, 1)
+}
+config01:OTHER>
+config01:PRIMARY>
+
+5> Add second node config2-monodb.local to the replica set with below command. 
+
+config01:PRIMARY> rs.add("192.168.1.32:27017")
+{
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : {
+                        "ts" : Timestamp(1594564564, 1),
+                        "t" : NumberLong(1)
+                },
+                "electionId" : ObjectId("7fffffff0000000000000001")
+        },
+        "lastCommittedOpTime" : Timestamp(1594564558, 1),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594564564, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1594564564, 1)
+}
+config01:PRIMARY>
+
+6> Check the status of the replication with status command.
+
+config01:PRIMARY> rs.status()
+{
+        "set" : "config01",
+        "date" : ISODate("2020-07-12T14:36:11.031Z"),
+        "myState" : 1,
+        "term" : NumberLong(1),
+        "syncingTo" : "",
+        "syncSourceHost" : "",
+        "syncSourceId" : -1,
+        "configsvr" : true,
+        "heartbeatIntervalMillis" : NumberLong(2000),
+        "majorityVoteCount" : 2,
+        "writeMajorityCount" : 2,
+        "optimes" : {
+                "lastCommittedOpTime" : {
+                        "ts" : Timestamp(1594564564, 1),
+                        "t" : NumberLong(1)
+                },
+                "lastCommittedWallTime" : ISODate("2020-07-12T14:36:04.738Z"),
+                "readConcernMajorityOpTime" : {
+                        "ts" : Timestamp(1594564564, 1),
+                        "t" : NumberLong(1)
+                },
+                "readConcernMajorityWallTime" : ISODate("2020-07-12T14:36:04.738Z"),
+                "appliedOpTime" : {
+                        "ts" : Timestamp(1594564564, 1),
+                        "t" : NumberLong(1)
+                },
+                "durableOpTime" : {
+                        "ts" : Timestamp(1594564564, 1),
+                        "t" : NumberLong(1)
+                },
+                "lastAppliedWallTime" : ISODate("2020-07-12T14:36:04.738Z"),
+                "lastDurableWallTime" : ISODate("2020-07-12T14:36:04.738Z")
+        },
+        "lastStableRecoveryTimestamp" : Timestamp(1594564564, 1),
+        "lastStableCheckpointTimestamp" : Timestamp(1594564564, 1),
+        "electionCandidateMetrics" : {
+                "lastElectionReason" : "electionTimeout",
+                "lastElectionDate" : ISODate("2020-07-12T14:35:08.519Z"),
+                "electionTerm" : NumberLong(1),
+                "lastCommittedOpTimeAtElection" : {
+                        "ts" : Timestamp(0, 0),
+                        "t" : NumberLong(-1)
+                },
+                "lastSeenOpTimeAtElection" : {
+                        "ts" : Timestamp(1594564508, 1),
+                        "t" : NumberLong(-1)
+                },
+                "numVotesNeeded" : 1,
+                "priorityAtElection" : 1,
+                "electionTimeoutMillis" : NumberLong(10000),
+                "newTermStartDate" : ISODate("2020-07-12T14:35:08.534Z"),
+                "wMajorityWriteAvailabilityDate" : ISODate("2020-07-12T14:35:08.757Z")
+        },
+        "members" : [
+                {
+                        "_id" : 0,
+                        "name" : "192.168.1.31:27017",
+                        "health" : 1,
+                        "state" : 1,
+                        "stateStr" : "PRIMARY",
+                        "uptime" : 115,
+                        "optime" : {
+                                "ts" : Timestamp(1594564564, 1),
+                                "t" : NumberLong(1)
+                        },
+                        "optimeDate" : ISODate("2020-07-12T14:36:04Z"),
+                        "syncingTo" : "",
+                        "syncSourceHost" : "",
+                        "syncSourceId" : -1,
+                        "infoMessage" : "could not find member to sync from",
+                        "electionTime" : Timestamp(1594564508, 2),
+                        "electionDate" : ISODate("2020-07-12T14:35:08Z"),
+                        "configVersion" : 2,
+                        "self" : true,
+                        "lastHeartbeatMessage" : ""
+                },
+                {
+                        "_id" : 1,
+                        "name" : "192.168.1.32:27017",
+                        "health" : 1,
+                        "state" : 2,
+                        "stateStr" : "SECONDARY",
+                        "uptime" : 6,
+                        "optime" : {
+                                "ts" : Timestamp(1594564564, 1),
+                                "t" : NumberLong(1)
+                        },
+                        "optimeDurable" : {
+                                "ts" : Timestamp(1594564564, 1),
+                                "t" : NumberLong(1)
+                        },
+                        "optimeDate" : ISODate("2020-07-12T14:36:04Z"),
+                        "optimeDurableDate" : ISODate("2020-07-12T14:36:04Z"),
+                        "lastHeartbeat" : ISODate("2020-07-12T14:36:10.750Z"),
+                        "lastHeartbeatRecv" : ISODate("2020-07-12T14:36:10.784Z"),
+                        "pingMs" : NumberLong(1),
+                        "lastHeartbeatMessage" : "",
+                        "syncingTo" : "",
+                        "syncSourceHost" : "",
+                        "syncSourceId" : -1,
+                        "infoMessage" : "",
+                        "configVersion" : 2
+                }
+        ],
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : {
+                        "ts" : Timestamp(1594564564, 1),
+                        "t" : NumberLong(1)
+                },
+                "electionId" : ObjectId("7fffffff0000000000000001")
+        },
+        "lastCommittedOpTime" : Timestamp(1594564564, 1),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594564564, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1594564564, 1)
+}
+config01:PRIMARY> 
+
+config01:PRIMARY> rs.conf()
+{
+        "_id" : "config01",
+        "version" : 2,
+        "configsvr" : true,
+        "protocolVersion" : NumberLong(1),
+        "writeConcernMajorityJournalDefault" : true,
+        "members" : [
+                {
+                        "_id" : 0,
+                        "host" : "192.168.1.31:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 1,
+                        "host" : "192.168.1.32:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                }
+        ],
+        "settings" : {
+                "chainingAllowed" : true,
+                "heartbeatIntervalMillis" : 2000,
+                "heartbeatTimeoutSecs" : 10,
+                "electionTimeoutMillis" : 10000,
+                "catchUpTimeoutMillis" : -1,
+                "catchUpTakeoverDelayMillis" : 30000,
+                "getLastErrorModes" : {
+
+                },
+                "getLastErrorDefaults" : {
+                        "w" : 1,
+                        "wtimeout" : 0
+                },
+                "replicaSetId" : ObjectId("5f1d7466d4292e9e040f8f8b")
+        }
+}
+config01:PRIMARY>
+
+
+7> Also check isMaster()
+
+config01:PRIMARY> rs.isMaster()
+{
+        "hosts" : [
+                "192.168.1.31:27017",
+                "192.168.1.32:27017"
+        ],
+        "setName" : "config01",
+        "setVersion" : 2,
+        "ismaster" : true,		<---- Check 
+        "secondary" : false,
+        "primary" : "192.168.1.31:27017",
+        "me" : "192.168.1.31:27017",
+        "electionId" : ObjectId("7fffffff0000000000000001"),
+        "lastWrite" : {
+                "opTime" : {
+                        "ts" : Timestamp(1594567209, 1),
+                        "t" : NumberLong(1)
+                },
+                "lastWriteDate" : ISODate("2020-07-12T15:20:09Z"),
+                "majorityOpTime" : {
+                        "ts" : Timestamp(1594567209, 1),
+                        "t" : NumberLong(1)
+                },
+                "majorityWriteDate" : ISODate("2020-07-12T15:20:09Z")
+        },
+        "configsvr" : 2,		<---- Check
+        "maxBsonObjectSize" : 16777216,
+        "maxMessageSizeBytes" : 48000000,
+        "maxWriteBatchSize" : 100000,
+        "localTime" : ISODate("2020-07-12T15:20:16.364Z"),
+        "logicalSessionTimeoutMinutes" : 30,
+        "connectionId" : 19,
+        "minWireVersion" : 0,
+        "maxWireVersion" : 8,
+        "readOnly" : false,
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : Timestamp(0, 0),
+                "electionId" : ObjectId("7fffffff0000000000000001")
+        },
+        "lastCommittedOpTime" : Timestamp(1594567209, 1),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594567209, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1594567209, 1)
+}
+config01:PRIMARY>
+bye
+
+
+
+8> Finish............
+
+
+
+
+
+Configuration of Shard Replica Set.
+-----------------------------------
+
+1> Edit files mongod.conf on servers - Replica Set 1(mongodb-11.local, mongodb-12.local, mongodb-13.local)
+				       Replica Set 2(mongodb-21.local, mongodb-22.local, mongodb-23.local)
+
+Shard1:ReplicaSet1
+
+@mongodb-11.local
+---------------
+bindIP: 127.0.0.1,192.168.1.11
+
+replication:
+  replSetName: "shardreplica01"
+
+sharding:
+  clusterRole: shardsvr
+
+@mongodb-12.local
+------------------
+bindIP: 192.168.1.12
+
+replication:
+   replSetName: "shardreplica01"
+
+sharding:
+   clusterRole: shardsvr
+
+@mongodb-13.local
+------------------
+bindIP: 192.168.1.13
+
+replication:
+   replSetName: "shardreplica01"
+
+sharding:
+   clusterRole: shardsvr
+
+
+Shard2:ReplicaSet2
+
+@mongodb-21.local
+---------------
+bindIP: 192.168.1.21
+
+replication:
+   replSetName: "shardreplica02"
+
+sharding:
+   clusterRole: shardsvr
+
+@mongodb-22.local
+------------------
+bindIP: 192.168.1.22
+
+replication:
+   replSetName: "shardreplica02"
+
+sharding:
+   clusterRole: shardsvr
+
+@mongodb-23.local
+------------------
+bindIP: 192.168.1.23
+
+replication:
+   replSetName: "shardreplica02"
+
+sharding:
+   clusterRole: shardsvr
+
+
+2> Restart the mongod services using command: systemctl restart mongod.service @replica set 1 servers and @replica set 2 servers.
+
+3> Now initiate replication and nodes to replication through sequence of commands from node mongodb-11.local.
+
+rs.initiate()
+rs.add("192.168.1.12:27017")
+rs.add("192.168.1.13:27017")
+
+4> Now initiate replication and nodes to replication through sequence of commands from node mongodb-21.local.
+
+rs.initiate()
+rs.add("192.168.1.22:27017")
+rs.add("192.168.1.23:27017")
+
+> rs.initiate()
+{
+        "info2" : "no configuration specified. Using a default configuration for the set",
+        "me" : "192.168.1.21:27017",
+        "ok" : 1,
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594568359, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1594568359, 1)
+}
+shardreplica02:OTHER>
+
+shardreplica02:PRIMARY> rs.add("192.168.1.22:27017")
+{
+        "ok" : 1,
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594568413, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1594568413, 1)
+}
+shardreplica02:PRIMARY> rs.add("192.168.1.23:27017")
+{
+        "ok" : 1,
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594568419, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1594568419, 1)
+}
+shardreplica02:PRIMARY>
+
+shardreplica02:PRIMARY> rs.status()
+{
+        "set" : "shardreplica02",
+        "date" : ISODate("2020-07-12T15:44:45.479Z"),
+        "myState" : 1,
+        "term" : NumberLong(1),
+        "syncingTo" : "",
+        "syncSourceHost" : "",
+        "syncSourceId" : -1,
+        "heartbeatIntervalMillis" : NumberLong(2000),
+        "majorityVoteCount" : 2,
+        "writeMajorityCount" : 2,
+        "optimes" : {
+                "lastCommittedOpTime" : {
+                        "ts" : Timestamp(1594568679, 1),
+                        "t" : NumberLong(1)
+                },
+                "lastCommittedWallTime" : ISODate("2020-07-12T15:44:39.525Z"),
+                "readConcernMajorityOpTime" : {
+                        "ts" : Timestamp(1594568679, 1),
+                        "t" : NumberLong(1)
+                },
+                "readConcernMajorityWallTime" : ISODate("2020-07-12T15:44:39.525Z"),
+                "appliedOpTime" : {
+                        "ts" : Timestamp(1594568679, 1),
+                        "t" : NumberLong(1)
+                },
+                "durableOpTime" : {
+                        "ts" : Timestamp(1594568679, 1),
+                        "t" : NumberLong(1)
+                },
+                "lastAppliedWallTime" : ISODate("2020-07-12T15:44:39.525Z"),
+                "lastDurableWallTime" : ISODate("2020-07-12T15:44:39.525Z")
+        },
+        "lastStableRecoveryTimestamp" : Timestamp(1594568659, 1),
+        "lastStableCheckpointTimestamp" : Timestamp(1594568659, 1),
+        "electionCandidateMetrics" : {
+                "lastElectionReason" : "electionTimeout",
+                "lastElectionDate" : ISODate("2020-07-12T15:39:19.417Z"),
+                "electionTerm" : NumberLong(1),
+                "lastCommittedOpTimeAtElection" : {
+                        "ts" : Timestamp(0, 0),
+                        "t" : NumberLong(-1)
+                },
+                "lastSeenOpTimeAtElection" : {
+                        "ts" : Timestamp(1594568359, 1),
+                        "t" : NumberLong(-1)
+                },
+                "numVotesNeeded" : 1,
+                "priorityAtElection" : 1,
+                "electionTimeoutMillis" : NumberLong(10000),
+                "newTermStartDate" : ISODate("2020-07-12T15:39:19.424Z"),
+                "wMajorityWriteAvailabilityDate" : ISODate("2020-07-12T15:39:19.523Z")
+        },
+        "members" : [
+                {
+                        "_id" : 0,
+                        "name" : "192.168.1.21:27017",
+                        "health" : 1,
+                        "state" : 1,
+                        "stateStr" : "PRIMARY",
+                        "uptime" : 365,
+                        "optime" : {
+                                "ts" : Timestamp(1594568679, 1),
+                                "t" : NumberLong(1)
+                        },
+                        "optimeDate" : ISODate("2020-07-12T15:44:39Z"),
+                        "syncingTo" : "",
+                        "syncSourceHost" : "",
+                        "syncSourceId" : -1,
+                        "infoMessage" : "",
+                        "electionTime" : Timestamp(1594568359, 2),
+                        "electionDate" : ISODate("2020-07-12T15:39:19Z"),
+                        "configVersion" : 3,
+                        "self" : true,
+                        "lastHeartbeatMessage" : ""
+                },
+                {
+                        "_id" : 1,
+                        "name" : "192.168.1.22:27017",
+                        "health" : 1,
+                        "state" : 2,
+                        "stateStr" : "SECONDARY",
+                        "uptime" : 272,
+                        "optime" : {
+                                "ts" : Timestamp(1594568679, 1),
+                                "t" : NumberLong(1)
+                        },
+                        "optimeDurable" : {
+                                "ts" : Timestamp(1594568679, 1),
+                                "t" : NumberLong(1)
+                        },
+                        "optimeDate" : ISODate("2020-07-12T15:44:39Z"),
+                        "optimeDurableDate" : ISODate("2020-07-12T15:44:39Z"),
+                        "lastHeartbeat" : ISODate("2020-07-12T15:44:43.740Z"),
+                        "lastHeartbeatRecv" : ISODate("2020-07-12T15:44:44.268Z"),
+                        "pingMs" : NumberLong(0),
+                        "lastHeartbeatMessage" : "",
+                        "syncingTo" : "192.168.1.21:27017",
+                        "syncSourceHost" : "192.168.1.21:27017",
+                        "syncSourceId" : 0,
+                        "infoMessage" : "",
+                        "configVersion" : 3
+                },
+                {
+                        "_id" : 2,
+                        "name" : "192.168.1.23:27017",
+                        "health" : 1,
+                        "state" : 2,
+                        "stateStr" : "SECONDARY",
+                        "uptime" : 266,
+                        "optime" : {
+                                "ts" : Timestamp(1594568679, 1),
+                                "t" : NumberLong(1)
+                        },
+                        "optimeDurable" : {
+                                "ts" : Timestamp(1594568679, 1),
+                                "t" : NumberLong(1)
+                        },
+                        "optimeDate" : ISODate("2020-07-12T15:44:39Z"),
+                        "optimeDurableDate" : ISODate("2020-07-12T15:44:39Z"),
+                        "lastHeartbeat" : ISODate("2020-07-12T15:44:43.752Z"),
+                        "lastHeartbeatRecv" : ISODate("2020-07-12T15:44:44.935Z"),
+                        "pingMs" : NumberLong(0),
+                        "lastHeartbeatMessage" : "",
+                        "syncingTo" : "192.168.1.22:27017",
+                        "syncSourceHost" : "192.168.1.22:27017",
+                        "syncSourceId" : 1,
+                        "infoMessage" : "",
+                        "configVersion" : 3
+                }
+        ],
+        "ok" : 1,
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594568679, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1594568679, 1)
+}
+shardreplica02:PRIMARY>
+
+5> Finish........
+
+
+
+
+
+
+Configure mongos/Query Router.
+------------------------------
+
+#mongos --configdb "config01/192.168.1.31:27017,192.168.1.32:27017" --port 27017 --bind_ip 127.0.0.1,192.168.1.41
+
+mongos --configdb "config01/192.168.1.31:27017,192.168.1.32:27017" --port 27017 --bind_ip 127.0.0.1,192.168.1.41 --logpath /var/log/mongodb/mongos.log --fork
+
+mongos --configdb "<replicaSetName>/<ip-configserver>:<port>,<ip-configserver>:<port>" --port 27017 --bind_ip 0.0.0.0
+
+Add shards to mongos/Query Router
+---------------------------------
+
+1> Open shell connect to the mongos server again, and access the mongo shell.
+
+mongo
+
+[root@router-mongodb ~]# mongo
+MongoDB shell version v4.2.8
+connecting to: mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb
+Implicit session: session { "id" : UUID("04a59dd8-c768-4158-b0d9-b321a1382cf4") }
+MongoDB server version: 4.2.8
+Server has startup warnings:
+2020-07-12T12:16:30.357-0400 I  CONTROL  [main]
+2020-07-12T12:16:30.357-0400 I  CONTROL  [main] ** WARNING: Access control is not enabled for the database.
+2020-07-12T12:16:30.357-0400 I  CONTROL  [main] **          Read and write access to data and configuration is unrestricted.
+2020-07-12T12:16:30.357-0400 I  CONTROL  [main] ** WARNING: You are running this process as the root user, which is not recommended.
+2020-07-12T12:16:30.357-0400 I  CONTROL  [main]
+2020-07-12T12:16:30.357-0400 I  CONTROL  [main] ** WARNING: This server is bound to localhost.
+2020-07-12T12:16:30.357-0400 I  CONTROL  [main] **          Remote systems will be unable to connect to this server.
+2020-07-12T12:16:30.357-0400 I  CONTROL  [main] **          Start the server with --bind_ip <address> to specify which IP
+2020-07-12T12:16:30.357-0400 I  CONTROL  [main] **          addresses it should serve responses from, or with --bind_ip_all to
+2020-07-12T12:16:30.357-0400 I  CONTROL  [main] **          bind to all interfaces. If this behavior is desired, start the
+2020-07-12T12:16:30.357-0400 I  CONTROL  [main] **          server with --bind_ip 127.0.0.1 to disable this warning.
+2020-07-12T12:16:30.357-0400 I  CONTROL  [main]
+mongos>
+
+2> Add shard server with the sh mongodb query.
+
+For 'shardreplica01' instances:
+
+sh.addShard( "shardreplica01/192.168.1.11:27017")
+sh.addShard( "shardreplica01/192.168.1.12:27017")
+sh.addShard( "shardreplica01/192.168.1.13:27017")
+
+
+For 'shardreplica02' instances:
+
+sh.addShard( "shardreplica02/192.168.1.21:27017")
+sh.addShard( "shardreplica02/192.168.1.22:27017")
+sh.addShard( "shardreplica02/192.168.1.23:27017")
+
+Output of all 6 add shard commands:
+
+mongos>
+mongos> sh.addShard( "shardreplica01/192.168.1.11:27017")
+{
+        "shardAdded" : "shardreplica01",
+        "ok" : 1,
+        "operationTime" : Timestamp(1594571032, 8),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594571032, 8),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        }
+}
+mongos> sh.addShard( "shardreplica01/192.168.1.12:27017")
+{
+        "shardAdded" : "shardreplica01",
+        "ok" : 1,
+        "operationTime" : Timestamp(1594571032, 9),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594571032, 9),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        }
+}
+mongos> sh.addShard( "shardreplica01/192.168.1.13:27017")
+{
+        "shardAdded" : "shardreplica01",
+        "ok" : 1,
+        "operationTime" : Timestamp(1594571042, 1),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594571042, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        }
+}
+mongos> sh.addShard( "shardreplica02/192.168.1.21:27017")
+{
+        "shardAdded" : "shardreplica02",
+        "ok" : 1,
+        "operationTime" : Timestamp(1594571059, 6),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594571059, 7),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        }
+}
+mongos> sh.addShard( "shardreplica02/192.168.1.22:27017")
+{
+        "shardAdded" : "shardreplica02",
+        "ok" : 1,
+        "operationTime" : Timestamp(1594571063, 20),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594571063, 20),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        }
+}
+mongos> sh.addShard( "shardreplica02/192.168.1.23:27017")
+{
+        "shardAdded" : "shardreplica02",
+        "ok" : 1,
+        "operationTime" : Timestamp(1594571069, 20),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1594571069, 20),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        }
+}
+mongos>
+
+
+
+3> Check status of shard.
+
+mongos>
+mongos> sh.status()
+--- Sharding Status ---
+  sharding version: {
+        "_id" : 1,
+        "minCompatibleVersion" : 5,
+        "currentVersion" : 6,
+        "clusterId" : ObjectId("5f0b1f9c4eb594674b7f2bfa")
+  }
+  shards:
+        {  "_id" : "shardreplica01",  "host" : "shardreplica01/192.168.1.11:27017,192.168.1.12:27017,192.168.1.13:27017",  "state" : 1 }	<--- Check
+        {  "_id" : "shardreplica02",  "host" : "shardreplica02/192.168.1.21:27017,192.168.1.22:27017,192.168.1.23:27017",  "state" : 1 }	<--- Check
+  active mongoses:
+        "4.2.8" : 1
+  autosplit:
+        Currently enabled: yes
+  balancer:
+        Currently enabled:  yes
+        Currently running:  no
+        Failed balancer rounds in last 5 attempts:  0
+        Migration Results for the last 24 hours:
+                61 : Success
+  databases:
+        {  "_id" : "config",  "primary" : "config",  "partitioned" : true }
+                config.system.sessions
+                        shard key: { "_id" : 1 }
+                        unique: false
+                        balancing: true
+                        chunks:
+                                shardreplica01  963
+                                shardreplica02  61
+                        too many chunks to print, use verbose if you want to force print
+
+mongos>
+
+
+4> Finish ....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Testing
+
+1> From router node add user mongo-admin as follows. 
+
+mongos>> use admin
+switched to db admin
+
+mongos> db.createUser({user: "mongo-admin", pwd: "password", roles:[{role: "root", db: "admin"}]})
+Successfully added user: {
+        "user" : "mongo-admin",
+        "roles" : [
+                {
+                        "role" : "root",
+                        "db" : "admin"
+                }
+        ]
+}
+
+
+2> Import json files as follows:
+
+mongoimport --db dbName --collection collectionName --file fileName.json 
+
+[root@router-mongodb samples]# ls -ltr *.json
+-rwxr-xr-x 1 22602 10513  624840 Mar 22  2015 films.json
+-rwxr-xr-x 1 22602 10513 4101764 Mar 22  2015 customers.json
+-rwxr-xr-x 1 22602 10513  293491 Mar 22  2015 stores.json
+
+mongoimport --db films --collection films --file films.json
+
+
+[root@router-mongodb samples]# mongoimport --db films --collection films --file films.json
+2020-07-26T10:51:08.537-0400    connected to: mongodb://localhost/
+2020-07-26T10:51:09.055-0400    1000 document(s) imported successfully. 0 document(s) failed to import.
+[root@router-mongodb samples]#
+
+
+[root@router-mongodb samples]# mongoimport --db customers --collection customers --file customers.json
+2020-07-26T10:54:12.904-0400    connected to: mongodb://localhost/
+2020-07-26T10:54:14.618-0400    599 document(s) imported successfully. 0 document(s) failed to import.
+[root@router-mongodb samples]#
+
+
+[root@router-mongodb samples]# mongoimport --db stores --collection stores --file stores.json
+2020-07-26T10:54:39.167-0400    connected to: mongodb://localhost/
+2020-07-26T10:54:39.406-0400    2 document(s) imported successfully. 0 document(s) failed to import.
+[root@router-mongodb samples]#
+
+
+3> Connect to database "use stores"
+
+mongos> use stores
+switched to db stores
+
+mongos> sh.enableSharding("stores")
+{
+        "ok" : 1,
+        "operationTime" : Timestamp(1595777561, 3),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1595777561, 3),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        }
+}
+mongos>
+
+
+mongos> db.stores.createIndex({"filmId":1})
+{
+        "raw" : {
+                "shardreplica01/192.168.1.11:27017,192.168.1.12:27017,192.168.1.13:27017" : {
+                        "createdCollectionAutomatically" : false,
+                        "numIndexesBefore" : 1,
+                        "numIndexesAfter" : 2,
+                        "ok" : 1
+                }
+        },
+        "ok" : 1,
+        "operationTime" : Timestamp(1595777730, 2),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1595777730, 2),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        }
+}
+mongos>
+
+
+
+mongos>  db.customers.createIndex({"Film Title":1})
+{
+        "raw" : {
+                "shardreplica01/192.168.1.11:27017,192.168.1.12:27017,192.168.1.13:27017" : {
+                        "createdCollectionAutomatically" : false,
+                        "numIndexesBefore" : 1,
+                        "numIndexesAfter" : 2,
+                        "ok" : 1
+                }
+        },
+        "ok" : 1,
+        "operationTime" : Timestamp(1595779230, 2),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1595779230, 2),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        }
+}
+
+
+
+mongos> sh.enableSharding("customers")
+{
+        "ok" : 1,
+        "operationTime" : Timestamp(1595779244, 4),
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1595779244, 4),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        }
+}
+mongos>
+
+4> Finish ....
+
+
+Client connectivity: 
+
+1> From router node add user mongo-admin as follows. 
+
+mongos>> use admin
+switched to db admin
+
+mongos> db.createUser({user: "mongo-admin", pwd: "password", roles:[{role: "root", db: "admin"}]})
+Successfully added user: {
+        "user" : "mongo-admin",
+        "roles" : [
+                {
+                        "role" : "root",
+                        "db" : "admin"
+                }
+        ]
+}
+
+2> Connect from mongo-compass from client machine.
+
+
+
+
+
+Reference Link: https://www.howtoforge.com/tutorial/deploying-mongodb-sharded-cluster-on-centos-7/

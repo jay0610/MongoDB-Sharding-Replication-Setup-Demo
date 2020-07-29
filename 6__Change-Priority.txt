@@ -1,0 +1,219 @@
+1. Check the current values set for priority.
+
+rs.conf()
+
+shardreplica01:PRIMARY> cfg = rs.conf()
+{
+        "_id" : "shardreplica01",
+        "version" : 5,
+        "protocolVersion" : NumberLong(1),
+        "writeConcernMajorityJournalDefault" : true,
+        "members" : [
+                {
+                        "_id" : 0,
+                        "host" : "192.168.1.11:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,              <--- Observe this value.
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 1,
+                        "host" : "192.168.1.12:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 2,
+                        "host" : "192.168.1.13:27017",
+                        "arbiterOnly" : true,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 0,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                }
+        ],
+        "settings" : {
+                "chainingAllowed" : true,
+                "heartbeatIntervalMillis" : 2000,
+                "heartbeatTimeoutSecs" : 10,
+                "electionTimeoutMillis" : 10000,
+                "catchUpTimeoutMillis" : -1,
+                "catchUpTakeoverDelayMillis" : 30000,
+                "getLastErrorModes" : {
+
+                },
+                "getLastErrorDefaults" : {
+                        "w" : 1,
+                        "wtimeout" : 0
+                },
+                "replicaSetId" : ObjectId("5f1d78b12214eae6bbbc65dd")
+        }
+}
+
+
+
+2. Define variable where the contents of the rs.conf() will be stored. 
+This can be done by command:
+
+cfg = rs.conf()
+
+3. Change the value of the member whose priority you want to change. 
+We are changing it only for mongodb-11 node in example.
+
+shardreplica01:PRIMARY> cfg.members[0].priority = 10
+10
+
+4. After step 3 configuration is saved but not applied yet. 
+Running rs.conf() will show the previous result only.
+
+5. Apply the configuration to setup with below command.
+
+shardreplica01:PRIMARY> rs.reconfig(cfg)
+{
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : {
+                        "ts" : Timestamp(1595998116, 1),
+                        "t" : NumberLong(8)
+                },
+                "electionId" : ObjectId("7fffffff0000000000000008")
+        },
+        "lastCommittedOpTime" : Timestamp(1595998112, 1),
+        "$configServerState" : {
+                "opTime" : {
+                        "ts" : Timestamp(1595998110, 1),
+                        "t" : NumberLong(7)
+                }
+        },
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1595998116, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1595998116, 1)
+}
+
+
+shardreplica01:PRIMARY> rs.config()
+{
+        "_id" : "shardreplica01",
+        "version" : 6,
+        "protocolVersion" : NumberLong(1),
+        "writeConcernMajorityJournalDefault" : true,
+        "members" : [
+                {
+                        "_id" : 0,
+                        "host" : "192.168.1.11:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 10,               <---- Value changed.
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 1,
+                        "host" : "192.168.1.12:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 2,
+                        "host" : "192.168.1.13:27017",
+                        "arbiterOnly" : true,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 0,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                }
+        ],
+        "settings" : {
+                "chainingAllowed" : true,
+                "heartbeatIntervalMillis" : 2000,
+                "heartbeatTimeoutSecs" : 10,
+                "electionTimeoutMillis" : 10000,
+                "catchUpTimeoutMillis" : -1,
+                "catchUpTakeoverDelayMillis" : 30000,
+                "getLastErrorModes" : {
+
+                },
+                "getLastErrorDefaults" : {
+                        "w" : 1,
+                        "wtimeout" : 0
+                },
+                "replicaSetId" : ObjectId("5f1d78b12214eae6bbbc65dd")
+        }
+}
+shardreplica01:PRIMARY>
+  
+
+
+Note: Reverting the priority of mongodb-11 to default value 1:
+
+cfg = rs.conf()
+
+shardreplica01:PRIMARY> cfg.members[0].priority		<--- You can check current value with this command
+10
+shardreplica01:PRIMARY> cfg.members[0].priority = 1	<--- Change the value
+1
+
+shardreplica01:PRIMARY> rs.reconfig(cfg)		<--- Apply the new configuration
+{
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : {
+                        "ts" : Timestamp(1595999770, 1),
+                        "t" : NumberLong(9)
+                },
+                "electionId" : ObjectId("7fffffff0000000000000009")
+        },
+        "lastCommittedOpTime" : Timestamp(1595999767, 1),
+        "$configServerState" : {
+                "opTime" : {
+                        "ts" : Timestamp(1595999769, 1),
+                        "t" : NumberLong(7)
+                }
+        },
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1595999770, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1595999770, 1)
+}
+shardreplica01:PRIMARY>

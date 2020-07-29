@@ -1,0 +1,939 @@
+1. Check if the node to be changed to arbiter is part of Replicaset using command : rs.conf()
+
+2. Stop mongod service on node which you want to add as Arbiter Node.
+
+systemctl stop mongod.service
+
+3. From Primary Node, remove the node from replication.
+
+rs.remove("192.168.1.13:27017")
+
+shardreplica01:PRIMARY> rs.remove("192.168.1.13:27017")
+{
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : {
+                        "ts" : Timestamp(1595918258, 1),
+                        "t" : NumberLong(7)
+                },
+                "electionId" : ObjectId("7fffffff0000000000000007")
+        },
+        "lastCommittedOpTime" : Timestamp(1595918255, 1),
+        "$configServerState" : {
+                "opTime" : {
+                        "ts" : Timestamp(1595918248, 1),
+                        "t" : NumberLong(5)
+                }
+        },
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1595918258, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1595918258, 1)
+}
+shardreplica01:PRIMARY>
+
+
+
+shardreplica01:PRIMARY> rs.conf()
+{
+        "_id" : "shardreplica01",
+        "version" : 4,
+        "protocolVersion" : NumberLong(1),
+        "writeConcernMajorityJournalDefault" : true,
+        "members" : [
+                {
+                        "_id" : 0,
+                        "host" : "192.168.1.11:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 1,
+                        "host" : "192.168.1.12:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                }
+        ],
+        "settings" : {
+                "chainingAllowed" : true,
+                "heartbeatIntervalMillis" : 2000,
+                "heartbeatTimeoutSecs" : 10,
+                "electionTimeoutMillis" : 10000,
+                "catchUpTimeoutMillis" : -1,
+                "catchUpTakeoverDelayMillis" : 30000,
+                "getLastErrorModes" : {
+
+                },
+                "getLastErrorDefaults" : {
+                        "w" : 1,
+                        "wtimeout" : 0
+                },
+                "replicaSetId" : ObjectId("5f1d78b12214eae6bbbc65dd")
+        }
+}
+shardreplica01:PRIMARY>
+
+
+
+shardreplica02:PRIMARY> rs.conf()
+{
+        "_id" : "shardreplica02",
+        "version" : 3,
+        "protocolVersion" : NumberLong(1),
+        "writeConcernMajorityJournalDefault" : true,
+        "members" : [
+                {
+                        "_id" : 0,
+                        "host" : "192.168.1.21:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 1,
+                        "host" : "192.168.1.22:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 2,
+                        "host" : "192.168.1.23:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                }
+        ],
+        "settings" : {
+                "chainingAllowed" : true,
+                "heartbeatIntervalMillis" : 2000,
+                "heartbeatTimeoutSecs" : 10,
+                "electionTimeoutMillis" : 10000,
+                "catchUpTimeoutMillis" : -1,
+                "catchUpTakeoverDelayMillis" : 30000,
+                "getLastErrorModes" : {
+
+                },
+                "getLastErrorDefaults" : {
+                        "w" : 1,
+                        "wtimeout" : 0
+                },
+                "replicaSetId" : ObjectId("5f1d7a66bafa574f41084c40")
+        }
+}
+shardreplica02:PRIMARY>
+shardreplica02:PRIMARY>
+shardreplica02:PRIMARY> rs.remove("192.168.1.23:27017")
+{
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : {
+                        "ts" : Timestamp(1595918652, 1),
+                        "t" : NumberLong(6)
+                },
+                "electionId" : ObjectId("7fffffff0000000000000006")
+        },
+        "lastCommittedOpTime" : Timestamp(1595918646, 1),
+        "$configServerState" : {
+                "opTime" : {
+                        "ts" : Timestamp(1595918641, 1),
+                        "t" : NumberLong(5)
+                }
+        },
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1595918652, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1595918652, 1)
+}
+
+
+shardreplica02:PRIMARY>  rs.conf()
+{
+        "_id" : "shardreplica02",
+        "version" : 4,
+        "protocolVersion" : NumberLong(1),
+        "writeConcernMajorityJournalDefault" : true,
+        "members" : [
+                {
+                        "_id" : 0,
+                        "host" : "192.168.1.21:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 1,
+                        "host" : "192.168.1.22:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                }
+        ],
+        "settings" : {
+                "chainingAllowed" : true,
+                "heartbeatIntervalMillis" : 2000,
+                "heartbeatTimeoutSecs" : 10,
+                "electionTimeoutMillis" : 10000,
+                "catchUpTimeoutMillis" : -1,
+                "catchUpTakeoverDelayMillis" : 30000,
+                "getLastErrorModes" : {
+
+                },
+                "getLastErrorDefaults" : {
+                        "w" : 1,
+                        "wtimeout" : 0
+                },
+                "replicaSetId" : ObjectId("5f1d7a66bafa574f41084c40")
+        }
+}
+shardreplica02:PRIMARY>
+
+
+4. Confirm if node is removed using command : rs.conf()
+
+
+
+
+
+shardreplica02:PRIMARY>  rs.conf()
+{
+        "_id" : "shardreplica02",
+        "version" : 4,
+        "protocolVersion" : NumberLong(1),
+        "writeConcernMajorityJournalDefault" : true,
+        "members" : [
+                {
+                        "_id" : 0,
+                        "host" : "192.168.1.21:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 1,
+                        "host" : "192.168.1.22:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                }
+        ],
+        "settings" : {
+                "chainingAllowed" : true,
+                "heartbeatIntervalMillis" : 2000,
+                "heartbeatTimeoutSecs" : 10,
+                "electionTimeoutMillis" : 10000,
+                "catchUpTimeoutMillis" : -1,
+                "catchUpTakeoverDelayMillis" : 30000,
+                "getLastErrorModes" : {
+
+                },
+                "getLastErrorDefaults" : {
+                        "w" : 1,
+                        "wtimeout" : 0
+                },
+                "replicaSetId" : ObjectId("5f1d7a66bafa574f41084c40")
+        }
+}
+
+
+shardreplica01:PRIMARY> rs.conf()
+{
+        "_id" : "shardreplica01",
+        "version" : 4,
+        "protocolVersion" : NumberLong(1),
+        "writeConcernMajorityJournalDefault" : true,
+        "members" : [
+                {
+                        "_id" : 0,
+                        "host" : "192.168.1.11:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 1,
+                        "host" : "192.168.1.12:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                }
+        ],
+        "settings" : {
+                "chainingAllowed" : true,
+                "heartbeatIntervalMillis" : 2000,
+                "heartbeatTimeoutSecs" : 10,
+                "electionTimeoutMillis" : 10000,
+                "catchUpTimeoutMillis" : -1,
+                "catchUpTakeoverDelayMillis" : 30000,
+                "getLastErrorModes" : {
+
+                },
+                "getLastErrorDefaults" : {
+                        "w" : 1,
+                        "wtimeout" : 0
+                },
+                "replicaSetId" : ObjectId("5f1d78b12214eae6bbbc65dd")
+        }
+}
+
+
+5. Delete or Rename the folder where data files are stored. 
+
+Check /etc/mongod.conf file for dbPath location and rename/delete it.
+
+[root@mongodb-13 ~]# systemctl stop mongod.service
+[root@mongodb-13 ~]# cat /etc/mongod.conf | grep -i dbpath
+  dbPath: /var/lib/mongo
+[root@mongodb-13 ~]# ls -ld /var/lib/mongo
+drwxr-xr-x 4 mongod mongod 4096 Jul 28 02:46 /var/lib/mongo
+[root@mongodb-13 ~]#
+[root@mongodb-13 ~]#
+[root@mongodb-13 ~]# mv /var/lib/mongo /var/lib/mongo-Del
+
+
+
+[root@mongodb-23 ~]# systemctl stop mongod.service
+[root@mongodb-23 ~]# cat /etc/mongod.conf | grep -i dbpath
+  dbPath: /var/lib/mongo
+[root@mongodb-23 ~]# ls -ld /var/lib/mongo
+drwxr-xr-x 4 mongod mongod 4096 Jul 28 02:46 /var/lib/mongo
+[root@mongodb-23 ~]#
+[root@mongodb-23 ~]# mv /var/lib/mongo /var/lib/mongo-Del
+
+
+6. Keep the conf file contents as they are and no change.
+
+7. Start mongod service on to-be-arbiter-node.
+
+systemctl start mongod.service
+
+[root@mongodb-13 ~]# mkdir -p /var/lib/mongo ; chown -R mongod:mongod /var/lib/mongo
+[root@mongodb-13 ~]# systemctl start mongod.service
+
+
+[root@mongodb-23 ~]# mkdir -p /var/lib/mongo ; chown -R mongod:mongod /var/lib/mongo
+[root@mongodb-23 ~]# systemctl start mongod.service
+
+Note: because you have deleted/renamed the datafiles location, your setup will not be aware that it was once a member of replicaset which was storing datafiles.
+
+when you connect mongo, you will not see Primary/Secondary on mongoshell as follows:
+
+[root@mongodb-13 ~]# mongo
+MongoDB shell version v4.2.8
+connecting to: mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb
+Implicit session: session { "id" : UUID("7d82c851-d203-4e11-8421-3b7d0ce9a159") }
+MongoDB server version: 4.2.8
+Server has startup warnings:
+2020-07-28T02:48:53.879-0400 I  CONTROL  [initandlisten]
+2020-07-28T02:48:53.879-0400 I  CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
+2020-07-28T02:48:53.879-0400 I  CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
+2020-07-28T02:48:53.879-0400 I  CONTROL  [initandlisten]
+2020-07-28T02:48:53.879-0400 I  CONTROL  [initandlisten]
+2020-07-28T02:48:53.879-0400 I  CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/enabled is 'always'.
+2020-07-28T02:48:53.879-0400 I  CONTROL  [initandlisten] **        We suggest setting it to 'never'
+2020-07-28T02:48:53.879-0400 I  CONTROL  [initandlisten]
+---
+Enable MongoDB's free cloud-based monitoring service, which will then receive and display
+metrics about your deployment (disk utilization, CPU, operation statistics, etc).
+
+The monitoring data will be available on a MongoDB website with a unique URL accessible to you
+and anyone you share the URL with. MongoDB may use this information to make product
+improvements and to suggest MongoDB products and deployment options to you.
+
+To enable free monitoring, run the following command: db.enableFreeMonitoring()
+To permanently disable this reminder, run the following command: db.disableFreeMonitoring()
+---
+
+>
+
+
+8. Add node as arbiter to existing replicaset (ONLY FROM PRIMARY NODE OF THE REPLICASET).
+
+rs.addArb("hostname:Port")
+
+shardreplica01:PRIMARY> rs.addArb("192.168.1.13:27017")
+{
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : {
+                        "ts" : Timestamp(1595919214, 1),
+                        "t" : NumberLong(7)
+                },
+                "electionId" : ObjectId("7fffffff0000000000000007")
+        },
+        "lastCommittedOpTime" : Timestamp(1595919205, 1),
+        "$configServerState" : {
+                "opTime" : {
+                        "ts" : Timestamp(1595919204, 1),
+                        "t" : NumberLong(5)
+                }
+        },
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1595919214, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1595919214, 1)
+}
+shardreplica01:PRIMARY>
+shardreplica01:PRIMARY>
+shardreplica01:PRIMARY> rs.conf()
+{
+        "_id" : "shardreplica01",
+        "version" : 5,
+        "protocolVersion" : NumberLong(1),
+        "writeConcernMajorityJournalDefault" : true,
+        "members" : [
+                {
+                        "_id" : 0,
+                        "host" : "192.168.1.11:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 1,
+                        "host" : "192.168.1.12:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 2,
+                        "host" : "192.168.1.13:27017",
+                        "arbiterOnly" : true,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 0,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                }
+        ],
+        "settings" : {
+                "chainingAllowed" : true,
+                "heartbeatIntervalMillis" : 2000,
+                "heartbeatTimeoutSecs" : 10,
+                "electionTimeoutMillis" : 10000,
+                "catchUpTimeoutMillis" : -1,
+                "catchUpTakeoverDelayMillis" : 30000,
+                "getLastErrorModes" : {
+
+                },
+                "getLastErrorDefaults" : {
+                        "w" : 1,
+                        "wtimeout" : 0
+                },
+                "replicaSetId" : ObjectId("5f1d78b12214eae6bbbc65dd")
+        }
+}
+shardreplica01:PRIMARY>
+
+shardreplica02:PRIMARY> rs.addArb("192.168.1.23:27017")
+{
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : {
+                        "ts" : Timestamp(1595919315, 1),
+                        "t" : NumberLong(6)
+                },
+                "electionId" : ObjectId("7fffffff0000000000000006")
+        },
+        "lastCommittedOpTime" : Timestamp(1595919306, 1),
+        "$configServerState" : {
+                "opTime" : {
+                        "ts" : Timestamp(1595919309, 1),
+                        "t" : NumberLong(5)
+                }
+        },
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1595919315, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1595919315, 1)
+}
+shardreplica02:PRIMARY>
+shardreplica02:PRIMARY> rs.conf()
+{
+        "_id" : "shardreplica02",
+        "version" : 5,
+        "protocolVersion" : NumberLong(1),
+        "writeConcernMajorityJournalDefault" : true,
+        "members" : [
+                {
+                        "_id" : 0,
+                        "host" : "192.168.1.21:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 1,
+                        "host" : "192.168.1.22:27017",
+                        "arbiterOnly" : false,
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 1,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                },
+                {
+                        "_id" : 2,
+                        "host" : "192.168.1.23:27017",
+                        "arbiterOnly" : true,				<---- Check the Property now changed to true 
+                        "buildIndexes" : true,
+                        "hidden" : false,
+                        "priority" : 0,
+                        "tags" : {
+
+                        },
+                        "slaveDelay" : NumberLong(0),
+                        "votes" : 1
+                }
+        ],
+        "settings" : {
+                "chainingAllowed" : true,
+                "heartbeatIntervalMillis" : 2000,
+                "heartbeatTimeoutSecs" : 10,
+                "electionTimeoutMillis" : 10000,
+                "catchUpTimeoutMillis" : -1,
+                "catchUpTakeoverDelayMillis" : 30000,
+                "getLastErrorModes" : {
+
+                },
+                "getLastErrorDefaults" : {
+                        "w" : 1,
+                        "wtimeout" : 0
+                },
+                "replicaSetId" : ObjectId("5f1d7a66bafa574f41084c40")
+        }
+}
+shardreplica02:PRIMARY>
+
+9. Confirm with rs.conf() command if node is added.
+
+shardreplica01:PRIMARY> rs.status()
+{
+        "set" : "shardreplica01",
+        "date" : ISODate("2020-07-28T06:56:30.005Z"),
+        "myState" : 1,
+        "term" : NumberLong(7),
+        "syncingTo" : "",
+        "syncSourceHost" : "",
+        "syncSourceId" : -1,
+        "heartbeatIntervalMillis" : NumberLong(2000),
+        "majorityVoteCount" : 2,
+        "writeMajorityCount" : 2,
+        "optimes" : {
+                "lastCommittedOpTime" : {
+                        "ts" : Timestamp(1595919385, 1),
+                        "t" : NumberLong(7)
+                },
+                "lastCommittedWallTime" : ISODate("2020-07-28T06:56:25.902Z"),
+                "readConcernMajorityOpTime" : {
+                        "ts" : Timestamp(1595919385, 1),
+                        "t" : NumberLong(7)
+                },
+                "readConcernMajorityWallTime" : ISODate("2020-07-28T06:56:25.902Z"),
+                "appliedOpTime" : {
+                        "ts" : Timestamp(1595919385, 1),
+                        "t" : NumberLong(7)
+                },
+                "durableOpTime" : {
+                        "ts" : Timestamp(1595919385, 1),
+                        "t" : NumberLong(7)
+                },
+                "lastAppliedWallTime" : ISODate("2020-07-28T06:56:25.902Z"),
+                "lastDurableWallTime" : ISODate("2020-07-28T06:56:25.902Z")
+        },
+        "lastStableRecoveryTimestamp" : Timestamp(1595919365, 1),
+        "lastStableCheckpointTimestamp" : Timestamp(1595919365, 1),
+        "electionCandidateMetrics" : {
+                "lastElectionReason" : "electionTimeout",
+                "lastElectionDate" : ISODate("2020-07-28T06:35:35.219Z"),
+                "electionTerm" : NumberLong(7),
+                "lastCommittedOpTimeAtElection" : {
+                        "ts" : Timestamp(0, 0),
+                        "t" : NumberLong(-1)
+                },
+                "lastSeenOpTimeAtElection" : {
+                        "ts" : Timestamp(1595786368, 1),
+                        "t" : NumberLong(4)
+                },
+                "numVotesNeeded" : 2,
+                "priorityAtElection" : 1,
+                "electionTimeoutMillis" : NumberLong(10000),
+                "numCatchUpOps" : NumberLong(0),
+                "newTermStartDate" : ISODate("2020-07-28T06:35:35.225Z"),
+                "wMajorityWriteAvailabilityDate" : ISODate("2020-07-28T06:35:36.080Z")
+        },
+        "members" : [
+                {
+                        "_id" : 0,
+                        "name" : "192.168.1.11:27017",
+                        "health" : 1,
+                        "state" : 1,
+                        "stateStr" : "PRIMARY",
+                        "uptime" : 1284,
+                        "optime" : {
+                                "ts" : Timestamp(1595919385, 1),
+                                "t" : NumberLong(7)
+                        },
+                        "optimeDate" : ISODate("2020-07-28T06:56:25Z"),
+                        "syncingTo" : "",
+                        "syncSourceHost" : "",
+                        "syncSourceId" : -1,
+                        "infoMessage" : "",
+                        "electionTime" : Timestamp(1595918135, 1),
+                        "electionDate" : ISODate("2020-07-28T06:35:35Z"),
+                        "configVersion" : 5,
+                        "self" : true,
+                        "lastHeartbeatMessage" : ""
+                },
+                {
+                        "_id" : 1,
+                        "name" : "192.168.1.12:27017",
+                        "health" : 1,
+                        "state" : 2,
+                        "stateStr" : "SECONDARY",
+                        "uptime" : 1262,
+                        "optime" : {
+                                "ts" : Timestamp(1595919385, 1),
+                                "t" : NumberLong(7)
+                        },
+                        "optimeDurable" : {
+                                "ts" : Timestamp(1595919385, 1),
+                                "t" : NumberLong(7)
+                        },
+                        "optimeDate" : ISODate("2020-07-28T06:56:25Z"),
+                        "optimeDurableDate" : ISODate("2020-07-28T06:56:25Z"),
+                        "lastHeartbeat" : ISODate("2020-07-28T06:56:28.513Z"),
+                        "lastHeartbeatRecv" : ISODate("2020-07-28T06:56:29.582Z"),
+                        "pingMs" : NumberLong(0),
+                        "lastHeartbeatMessage" : "",
+                        "syncingTo" : "192.168.1.11:27017",
+                        "syncSourceHost" : "192.168.1.11:27017",
+                        "syncSourceId" : 0,
+                        "infoMessage" : "",
+                        "configVersion" : 5
+                },
+                {
+                        "_id" : 2,
+                        "name" : "192.168.1.13:27017",
+                        "health" : 1,
+                        "state" : 7,
+                        "stateStr" : "ARBITER",				<---- Property changed in status command.
+                        "uptime" : 175,
+                        "lastHeartbeat" : ISODate("2020-07-28T06:56:28.521Z"),
+                        "lastHeartbeatRecv" : ISODate("2020-07-28T06:56:28.550Z"),
+                        "pingMs" : NumberLong(0),
+                        "lastHeartbeatMessage" : "",
+                        "syncingTo" : "",
+                        "syncSourceHost" : "",
+                        "syncSourceId" : -1,
+                        "infoMessage" : "",
+                        "configVersion" : 5
+                }
+        ],
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : {
+                        "ts" : Timestamp(1595919214, 1),
+                        "t" : NumberLong(7)
+                },
+                "electionId" : ObjectId("7fffffff0000000000000007")
+        },
+        "lastCommittedOpTime" : Timestamp(1595919385, 1),
+        "$configServerState" : {
+                "opTime" : {
+                        "ts" : Timestamp(1595919383, 4),
+                        "t" : NumberLong(5)
+                }
+        },
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1595919386, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1595919385, 1)
+}
+shardreplica01:PRIMARY>
+
+
+
+
+shardreplica02:PRIMARY>  rs.status()
+{
+        "set" : "shardreplica02",
+        "date" : ISODate("2020-07-28T06:57:37.026Z"),
+        "myState" : 1,
+        "term" : NumberLong(6),
+        "syncingTo" : "",
+        "syncSourceHost" : "",
+        "syncSourceId" : -1,
+        "heartbeatIntervalMillis" : NumberLong(2000),
+        "majorityVoteCount" : 2,
+        "writeMajorityCount" : 2,
+        "optimes" : {
+                "lastCommittedOpTime" : {
+                        "ts" : Timestamp(1595919456, 1),
+                        "t" : NumberLong(6)
+                },
+                "lastCommittedWallTime" : ISODate("2020-07-28T06:57:36.690Z"),
+                "readConcernMajorityOpTime" : {
+                        "ts" : Timestamp(1595919456, 1),
+                        "t" : NumberLong(6)
+                },
+                "readConcernMajorityWallTime" : ISODate("2020-07-28T06:57:36.690Z"),
+                "appliedOpTime" : {
+                        "ts" : Timestamp(1595919456, 1),
+                        "t" : NumberLong(6)
+                },
+                "durableOpTime" : {
+                        "ts" : Timestamp(1595919456, 1),
+                        "t" : NumberLong(6)
+                },
+                "lastAppliedWallTime" : ISODate("2020-07-28T06:57:36.690Z"),
+                "lastDurableWallTime" : ISODate("2020-07-28T06:57:36.690Z")
+        },
+        "lastStableRecoveryTimestamp" : Timestamp(1595919426, 1),
+        "lastStableCheckpointTimestamp" : Timestamp(1595919426, 1),
+        "electionCandidateMetrics" : {
+                "lastElectionReason" : "stepUpRequestSkipDryRun",
+                "lastElectionDate" : ISODate("2020-07-28T06:42:05.308Z"),
+                "electionTerm" : NumberLong(6),
+                "lastCommittedOpTimeAtElection" : {
+                        "ts" : Timestamp(1595918516, 1),
+                        "t" : NumberLong(5)
+                },
+                "lastSeenOpTimeAtElection" : {
+                        "ts" : Timestamp(1595918516, 1),
+                        "t" : NumberLong(5)
+                },
+                "numVotesNeeded" : 2,
+                "priorityAtElection" : 1,
+                "electionTimeoutMillis" : NumberLong(10000),
+                "priorPrimaryMemberId" : 2,
+                "numCatchUpOps" : NumberLong(0),
+                "newTermStartDate" : ISODate("2020-07-28T06:42:06.398Z"),
+                "wMajorityWriteAvailabilityDate" : ISODate("2020-07-28T06:42:07.079Z")
+        },
+        "electionParticipantMetrics" : {
+                "votedForCandidate" : true,
+                "electionTerm" : NumberLong(5),
+                "lastVoteDate" : ISODate("2020-07-28T06:35:35.879Z"),
+                "electionCandidateMemberId" : 2,
+                "voteReason" : "",
+                "lastAppliedOpTimeAtElection" : {
+                        "ts" : Timestamp(1595786355, 1),
+                        "t" : NumberLong(4)
+                },
+                "maxAppliedOpTimeInSet" : {
+                        "ts" : Timestamp(1595786355, 1),
+                        "t" : NumberLong(4)
+                },
+                "priorityAtElection" : 1
+        },
+        "members" : [
+                {
+                        "_id" : 0,
+                        "name" : "192.168.1.21:27017",
+                        "health" : 1,
+                        "state" : 1,
+                        "stateStr" : "PRIMARY",
+                        "uptime" : 1351,
+                        "optime" : {
+                                "ts" : Timestamp(1595919456, 1),
+                                "t" : NumberLong(6)
+                        },
+                        "optimeDate" : ISODate("2020-07-28T06:57:36Z"),
+                        "syncingTo" : "",
+                        "syncSourceHost" : "",
+                        "syncSourceId" : -1,
+                        "infoMessage" : "",
+                        "electionTime" : Timestamp(1595918525, 1),
+                        "electionDate" : ISODate("2020-07-28T06:42:05Z"),
+                        "configVersion" : 5,
+                        "self" : true,
+                        "lastHeartbeatMessage" : ""
+                },
+                {
+                        "_id" : 1,
+                        "name" : "192.168.1.22:27017",
+                        "health" : 1,
+                        "state" : 2,
+                        "stateStr" : "SECONDARY",
+                        "uptime" : 1331,
+                        "optime" : {
+                                "ts" : Timestamp(1595919446, 1),
+                                "t" : NumberLong(6)
+                        },
+                        "optimeDurable" : {
+                                "ts" : Timestamp(1595919446, 1),
+                                "t" : NumberLong(6)
+                        },
+                        "optimeDate" : ISODate("2020-07-28T06:57:26Z"),
+                        "optimeDurableDate" : ISODate("2020-07-28T06:57:26Z"),
+                        "lastHeartbeat" : ISODate("2020-07-28T06:57:36.178Z"),
+                        "lastHeartbeatRecv" : ISODate("2020-07-28T06:57:36.235Z"),
+                        "pingMs" : NumberLong(0),
+                        "lastHeartbeatMessage" : "",
+                        "syncingTo" : "192.168.1.21:27017",
+                        "syncSourceHost" : "192.168.1.21:27017",
+                        "syncSourceId" : 0,
+                        "infoMessage" : "",
+                        "configVersion" : 5
+                },
+                {
+                        "_id" : 2,
+                        "name" : "192.168.1.23:27017",
+                        "health" : 1,
+                        "state" : 7,
+                        "stateStr" : "ARBITER",
+                        "uptime" : 141,
+                        "lastHeartbeat" : ISODate("2020-07-28T06:57:36.178Z"),
+                        "lastHeartbeatRecv" : ISODate("2020-07-28T06:57:36.220Z"),
+                        "pingMs" : NumberLong(0),
+                        "lastHeartbeatMessage" : "",
+                        "syncingTo" : "",
+                        "syncSourceHost" : "",
+                        "syncSourceId" : -1,
+                        "infoMessage" : "",
+                        "configVersion" : 5
+                }
+        ],
+        "ok" : 1,
+        "$gleStats" : {
+                "lastOpTime" : {
+                        "ts" : Timestamp(1595919315, 1),
+                        "t" : NumberLong(6)
+                },
+                "electionId" : ObjectId("7fffffff0000000000000006")
+        },
+        "lastCommittedOpTime" : Timestamp(1595919456, 1),
+        "$configServerState" : {
+                "opTime" : {
+                        "ts" : Timestamp(1595919454, 1),
+                        "t" : NumberLong(5)
+                }
+        },
+        "$clusterTime" : {
+                "clusterTime" : Timestamp(1595919456, 1),
+                "signature" : {
+                        "hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+                        "keyId" : NumberLong(0)
+                }
+        },
+        "operationTime" : Timestamp(1595919456, 1)
+}
+shardreplica02:PRIMARY>
+
+
+10. Finish ...
+ 

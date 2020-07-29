@@ -1,0 +1,37 @@
+shardreplica01:PRIMARY> show dbs
+admin   0.000GB
+config  0.000GB
+local   0.169GB
+
+
+shardreplica01:PRIMARY> use admin
+switched to db admin
+shardreplica01:PRIMARY> show collections
+system.version
+
+
+
+shardreplica01:PRIMARY> use config
+switched to db config
+shardreplica01:PRIMARY> show collections
+cache.chunks.config.system.sessions
+cache.collections
+cache.databases
+system.sessions
+transactions
+
+
+
+
+shardreplica01:PRIMARY> use local
+switched to db local
+shardreplica01:PRIMARY> show collections
+oplog.rs
+replset.election
+replset.minvalid
+replset.oplogTruncateAfterPoint
+startup_log
+system.replset
+system.rollback.id
+shardreplica01:PRIMARY>
+

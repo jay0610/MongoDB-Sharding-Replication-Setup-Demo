@@ -1,0 +1,48 @@
+ukPostCode.postCodecoll
+
+use ukPostCode
+
+sh.enableSharding("ukPostCode")
+
+db.postCodecoll.createIndex({_id:1})
+
+sh.shardCollection("ukPostCode.postCodecoll",{_id:1})
+
+mongos> use ukPostCode
+mongos> show collections
+postCodecoll
+
+mongos> db.postCodecoll.getShardDistribution()
+
+mongos> db.postCodecoll.getShardDistribution()
+
+Shard shardreplica01 at shardreplica01/192.168.1.11:27017,192.168.1.12:27017,192.168.1.13:27017
+ data : 212.5MiB docs : 1758226 chunks : 4
+ estimated data per chunk : 53.12MiB
+ estimated docs per chunk : 439556
+
+Shard shardreplica02 at shardreplica02/192.168.1.21:27017,192.168.1.22:27017,192.168.1.23:27017
+ data : 96.15MiB docs : 798917 chunks : 3
+ estimated data per chunk : 32.05MiB
+ estimated docs per chunk : 266305
+
+Totals
+ data : 308.66MiB docs : 2557143 chunks : 7
+ Shard shardreplica01 contains 68.84% data, 68.75% docs in cluster, avg obj size on shard : 126B
+ Shard shardreplica02 contains 31.15% data, 31.24% docs in cluster, avg obj size on shard : 126B
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+youtube.statistics
+
+use youtube
+
+sh.enableSharding("youtube")
+
+db.statistics.createIndex({_id:1})
+
+sh.shardCollection("youtube.statistics",{_id:1})
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Source for DataSet : https://www.kaggle.com/

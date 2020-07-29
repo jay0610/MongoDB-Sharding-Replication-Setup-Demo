@@ -1,0 +1,336 @@
+Method 1 : Using yum install mongod.service gets created.
+
+All the config files and data directories gets created. We have to start the servie to make mongo instance up.
+
+Method 2: Using method:1 we create new service and start mongo instance using the same service to make mongo instance up.
+
+All the config files and data directories are to be created manually. This is manual process unlike Method 1.
+
+Method 3: Using mongod command we run the mongo instance on command line (Mostly used for debug/testing)
+
+All the config files and data directories are to be created manually. 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Method 1: 
+
+1. Install mongod using below commands.
+
+
+[root@mongostandalone ~]# cat /etc/yum.repos.d/mongodb-org-4.2.repo
+[mongodb-org-4.2]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.2/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-4.2.asc
+[root@mongostandalone ~]#
+
+
+[root@mongostandalone ~]# yum install mongodb-org
+CentOS-8 - AppStream                                                                                       3.9 kB/s | 4.3 kB     00:01
+CentOS-8 - Base                                                                                            6.0 kB/s | 3.9 kB     00:00
+CentOS-8 - Extras                                                                                          2.6 kB/s | 1.5 kB     00:00
+MongoDB Repository                                                                                         5.1 kB/s | 2.5 kB     00:00
+Package mongodb-org-4.2.8-1.el8.x86_64 is already installed.
+Dependencies resolved.
+Nothing to do.
+Complete!
+
+2. Using command start the mongod service as follows. 
+
+[root@mongostandalone ~]# systemctl start mongod.service
+
+[root@mongostandalone ~]# systemctl status mongod.service
+● mongod.service - MongoDB Database Server
+   Loaded: loaded (/usr/lib/systemd/system/mongod.service; enabled; vendor preset: disabled)
+   Active: active (running) since Tue 2020-07-14 02:16:23 EDT; 6min ago
+     Docs: https://docs.mongodb.org/manual
+  Process: 965 ExecStart=/usr/bin/mongod $OPTIONS (code=exited, status=0/SUCCESS)
+  Process: 958 ExecStartPre=/usr/bin/chmod 0755 /var/run/mongodb (code=exited, status=0/SUCCESS)
+  Process: 955 ExecStartPre=/usr/bin/chown mongod:mongod /var/run/mongodb (code=exited, status=0/SUCCESS)
+  Process: 948 ExecStartPre=/usr/bin/mkdir -p /var/run/mongodb (code=exited, status=0/SUCCESS)
+ Main PID: 978 (mongod)
+   Memory: 214.4M
+   CGroup: /system.slice/mongod.service
+           └─978 /usr/bin/mongod -f /etc/mongod.conf
+
+Jul 14 02:16:13 mongostandalone.local systemd[1]: Starting MongoDB Database Server...
+Jul 14 02:16:14 mongostandalone.local mongod[965]: about to fork child process, waiting until server is ready for connections.
+Jul 14 02:16:14 mongostandalone.local mongod[965]: forked process: 978
+Jul 14 02:16:23 mongostandalone.local mongod[965]: child process started successfully, parent exiting
+Jul 14 02:16:23 mongostandalone.local systemd[1]: Started MongoDB Database Server.
+[root@mongostandalone ~]#
+
+3. Check the mongod.conf and mongod.service file for the parameters and comapre with their physical location.
+
+mongod.service file contents:
+
+************************************************************************************************************************************************
+[root@mongostandalone ~]# cat /usr/lib/systemd/system/mongod.service
+[Unit]
+Description=MongoDB Database Server
+Documentation=https://docs.mongodb.org/manual
+After=network.target
+
+[Service]
+User=mongod
+Group=mongod
+Environment="OPTIONS=-f /etc/mongod.conf"
+EnvironmentFile=-/etc/sysconfig/mongod
+ExecStart=/usr/bin/mongod $OPTIONS
+ExecStartPre=/usr/bin/mkdir -p /var/run/mongodb
+ExecStartPre=/usr/bin/chown mongod:mongod /var/run/mongodb
+ExecStartPre=/usr/bin/chmod 0755 /var/run/mongodb
+PermissionsStartOnly=true
+PIDFile=/var/run/mongodb/mongod.pid
+Type=forking
+# file size
+LimitFSIZE=infinity
+# cpu time
+LimitCPU=infinity
+# virtual memory size
+LimitAS=infinity
+# open files
+LimitNOFILE=64000
+# processes/threads
+LimitNPROC=64000
+# locked memory
+LimitMEMLOCK=infinity
+# total threads (user+kernel)
+TasksMax=infinity
+TasksAccounting=false
+# Recommended limits for for mongod as specified in
+# http://docs.mongodb.org/manual/reference/ulimit/#recommended-settings
+
+[Install]
+WantedBy=multi-user.target
+[root@mongostandalone ~]#
+
+************************************************************************************************************************************************
+************************************************************************************************************************************************
+
+[root@mongostandalone ~]# cat /etc/mongod.conf
+# mongod.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path: /var/log/mongodb/mongod.log
+
+# Where and how to store data.
+storage:
+  dbPath: /var/lib/mongo
+  journal:
+    enabled: true
+#  engine:
+#  wiredTiger:
+
+# how the process runs
+processManagement:
+  fork: true  # fork and run in background
+  pidFilePath: /var/run/mongodb/mongod.pid  # location of pidfile
+  timeZoneInfo: /usr/share/zoneinfo
+
+# network interfaces
+net:
+  port: 27017
+  bindIp: 192.168.1.51,127.0.0.1  # Enter 0.0.0.0,:: to bind to all IPv4 and IPv6 addresses or, alternatively, use the net.bindIpAll setting.
+
+
+#security:
+
+#operationProfiling:
+
+#replication:
+
+#sharding:
+
+## Enterprise-Only Options
+
+#auditLog:
+
+#snmp:
+************************************************************************************************************************************************
+
+4. Connect mongo console using below command.
+
+[root@mongostandalone ~]# mongo --host mongostandalone --port 27017
+MongoDB shell version v4.2.8
+connecting to: mongodb://mongostandalone:27017/?compressors=disabled&gssapiServiceName=mongodb
+Implicit session: session { "id" : UUID("9ce34535-6ff0-4f37-93cf-302bda5526ae") }
+MongoDB server version: 4.2.8
+Server has startup warnings:
+2020-07-14T02:30:17.098-0400 I  CONTROL  [initandlisten]
+2020-07-14T02:30:17.098-0400 I  CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
+2020-07-14T02:30:17.098-0400 I  CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
+2020-07-14T02:30:17.098-0400 I  CONTROL  [initandlisten]
+2020-07-14T02:30:17.098-0400 I  CONTROL  [initandlisten]
+2020-07-14T02:30:17.098-0400 I  CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/enabled is 'always'.
+2020-07-14T02:30:17.098-0400 I  CONTROL  [initandlisten] **        We suggest setting it to 'never'
+2020-07-14T02:30:17.098-0400 I  CONTROL  [initandlisten]
+---
+Enable MongoDB's free cloud-based monitoring service, which will then receive and display
+metrics about your deployment (disk utilization, CPU, operation statistics, etc).
+
+The monitoring data will be available on a MongoDB website with a unique URL accessible to you
+and anyone you share the URL with. MongoDB may use this information to make product
+improvements and to suggest MongoDB products and deployment options to you.
+
+To enable free monitoring, run the following command: db.enableFreeMonitoring()
+To permanently disable this reminder, run the following command: db.disableFreeMonitoring()
+---
+
+> show dbs
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+>
+
+5. Finish .........
+
+
+
+
+Method 2: 
+
+Observing the above method, let's create new service as mongod1.service. 
+
+1. Create neccessary folders and files.
+
+1.1. Create copy of files mongod.service and mongod.conf. 
+
+[root@mongostandalone ~]# cp -p /usr/lib/systemd/system/mongod.service /usr/lib/systemd/system/mongod1.service
+
+[root@mongostandalone ~]# cp -p /etc/mongod.conf /etc/mongod1.conf
+
+edit file '/usr/lib/systemd/system/mongod1.service' to make these changes: 
+
+Environment="OPTIONS=-f /etc/mongod1.conf"
+EnvironmentFile=-/etc/sysconfig/mongod1
+PIDFile=/var/run/mongodb/mongod1.pid
+
+edit file '/etc/mongod1.conf' to make changes:
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path: /var/log/mongodb/mongod1.log
+
+
+
+# Where and how to store data.
+storage:
+  dbPath: /var/lib/mongo1
+
+
+# how the process runs
+processManagement:
+  fork: true  # fork and run in background
+  pidFilePath: /var/run/mongodb/mongod1.pid  # location of pidfile
+
+
+net:
+  port: 27027
+
+1.2. Create neccessary folders/files and change their owners/permissions to mongod:mongod
+
+Note: For this comapare permissions of default files.
+
+[root@mongostandalone ~]# touch /var/run/mongodb/mongod1.pid
+
+[root@mongostandalone ~]# chmod 644 /var/run/mongodb/mongod1.pid
+
+[root@mongostandalone ~]# touch /var/log/mongodb/mongod1.log
+[root@mongostandalone ~]# chown mongod:mongod /var/log/mongodb/mongod1.log
+[root@mongostandalone ~]# chmod 640 /var/log/mongodb/mongod1.log
+
+
+[root@mongostandalone ~]# mkdir /var/lib/mongo1
+[root@mongostandalone ~]# chown -R mongod:mongod /var/lib/mongo1
+[root@mongostandalone ~]# ls -ld /var/lib/mongo1
+drwxr-xr-x 2 mongod mongod 6 Jul 14 02:50 /var/lib/mongo1
+
+2. Start the mongod1 service with below sequence of commands.
+
+[root@mongostandalone ~]# updatedb
+[root@mongostandalone ~]# systemctl start mongod1.service
+
+3. Check the number of instaces of mongod are running with command.
+
+[root@mongostandalone ~]# ps -ef | grep mongo
+mongod     1936      1  0 02:30 ?        00:00:13 /usr/bin/mongod -f /etc/mongod.conf
+mongod     2135      1 15 02:57 ?        00:00:01 /usr/bin/mongod -f /etc/mongod1.conf
+root       2169   1749  0 02:57 pts/0    00:00:00 grep --color=auto mongo
+
+4. Connect new mongo instance as follows:
+
+[root@mongostandalone ~]# mongo --host `hostname` --port 27027
+MongoDB shell version v4.2.8
+connecting to: mongodb://mongostandalone.local:27027/?compressors=disabled&gssapiServiceName=mongodb
+Implicit session: session { "id" : UUID("0d1dd047-8b4d-42f1-8da6-d5942ce81a2f") }
+MongoDB server version: 4.2.8
+Server has startup warnings:
+2020-07-14T02:57:33.009-0400 I  CONTROL  [initandlisten]
+2020-07-14T02:57:33.010-0400 I  CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
+2020-07-14T02:57:33.010-0400 I  CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
+2020-07-14T02:57:33.010-0400 I  CONTROL  [initandlisten]
+2020-07-14T02:57:33.010-0400 I  CONTROL  [initandlisten]
+2020-07-14T02:57:33.010-0400 I  CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/enabled is 'always'.
+2020-07-14T02:57:33.010-0400 I  CONTROL  [initandlisten] **        We suggest setting it to 'never'
+2020-07-14T02:57:33.010-0400 I  CONTROL  [initandlisten]
+---
+Enable MongoDB's free cloud-based monitoring service, which will then receive and display
+metrics about your deployment (disk utilization, CPU, operation statistics, etc).
+
+The monitoring data will be available on a MongoDB website with a unique URL accessible to you
+and anyone you share the URL with. MongoDB may use this information to make product
+improvements and to suggest MongoDB products and deployment options to you.
+
+To enable free monitoring, run the following command: db.enableFreeMonitoring()
+To permanently disable this reminder, run the following command: db.disableFreeMonitoring()
+---
+
+> show dbs
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+>
+
+5. Finish .......
+
+
+
+
+Method 3: 
+
+Start the instance on the fly on command line as follows:
+
+1. Create neccessary directories. 
+
+dbpath = /var/lib/mongo2
+use port = 27037
+
+mongod --dbpath /var/lib/mongo2 --logpath /var/log/mongodb/mongod2.log --port 27037 
+
+
+[root@mongostandalone ~]# mongod --dbpath /var/lib/mongo2 --logpath /var/log/mongodb/mongod2.log --port 27037
+2020-07-14T03:02:40.555-0400 I  CONTROL  [main] log file "/var/log/mongodb/mongod2.log" exists; moved to "/var/log/mongodb/mongod2.log.2020-07-14T07-02-40".
+<<Instance started>> 
+
+Check from another session for number of mongod processes running. 
+
+[root@mongostandalone ~]# ps -ef | grep mongod
+mongod     1936      1  0 02:30 ?        00:00:16 /usr/bin/mongod -f /etc/mongod.conf
+mongod     2135      1  1 02:57 ?        00:00:04 /usr/bin/mongod -f /etc/mongod1.conf
+root       2212   1749  4 03:02 pts/0    00:00:02 mongod --dbpath /var/lib/mongo2 --logpath /var/log/mongodb/mongod2.log --port 27037
+root       2284   2249  0 03:03 pts/1    00:00:00 grep --color=auto mongod
+[root@mongostandalone ~]#
+
+
+
+

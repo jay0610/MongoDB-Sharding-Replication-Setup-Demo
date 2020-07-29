@@ -1,0 +1,59 @@
+1. Check current status of replication with command: rs.status() and to check current configuration rs.conf()
+
+2. Store the configuration into a variable cfg with command: cfg = rs.conf()
+
+3. Since we are changing values for mongod-12 node so run this command to change the priority of the _id=1 with command: cfg.members[1].priority = 0
+
+4. Since delayed node will alway be a hidden node we have to set hidden node attribute to True with command: cfg.members[1].hidden = true [Else we get error message: "errmsg" : "priority must be 0 when slaveDelay is used"
+
+5. Set the value for delay with command: cfg.members[1].slaveDelay = 3600
+
+6. Apply the save configuration with command: rs.reconfig(cfg)
+
+7. Finish ...
+
+
+Note: Check Delay now.
+
+If we check delay, it will go on increase by time as follow:
+
+shardreplica01:PRIMARY> rs.printSlaveReplicationInfo()
+source: 192.168.1.12:27017					<-- Observe the source of delay i.e. mongodb-12.local
+        syncedTo: Wed Jul 29 2020 01:01:09 GMT-0400 (EDT)
+        298 secs (0.08 hrs) behind the primary			<--- lag
+
+
+shardreplica01:PRIMARY> rs.printSlaveReplicationInfo()
+source: 192.168.1.12:27017
+        syncedTo: Wed Jul 29 2020 01:01:09 GMT-0400 (EDT)
+        358 secs (0.1 hrs) behind the primary			<---
+
+shardreplica01:PRIMARY> rs.printSlaveReplicationInfo()
+source: 192.168.1.12:27017
+        syncedTo: Wed Jul 29 2020 01:01:09 GMT-0400 (EDT)
+        358 secs (0.1 hrs) behind the primary			<---
+shardreplica01:PRIMARY>
+
+shardreplica01:PRIMARY> rs.printSlaveReplicationInfo()
+source: 192.168.1.12:27017
+        syncedTo: Wed Jul 29 2020 01:01:09 GMT-0400 (EDT)
+        438 secs (0.12 hrs) behind the primary
+shardreplica01:PRIMARY>
+
+
+Note2: Reverted changes.
+
+Run in fresh session (as we dont want any variable from previous steps affect here) in below order.
+
+cfg = rs.conf()
+cfg.members[1].priority = 1
+cfg.members[1].hidden = false
+cfg.members[1].slaveDelay = 0
+rs.reconfig(cfg)
+
+shardreplica01:PRIMARY> rs.printSlaveReplicationInfo()
+source: 192.168.1.12:27017
+        syncedTo: Wed Jul 29 2020 01:12:10 GMT-0400 (EDT)
+        0 secs (0 hrs) behind the primary
+shardreplica01:PRIMARY>
+
